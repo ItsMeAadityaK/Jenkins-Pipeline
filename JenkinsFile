@@ -2,44 +2,123 @@ pipeline {
     agent any
 
     environment {
-        DIRECTORY_PATH = 'C:\\Program Files\\Jenkins'
-        TESTING_ENVIRONMENT = 'TestingEnvironmentName'
-        PRODUCTION_ENVIRONMENT = 'YourNameProduction'
+        EMAIL_RECIPIENT = 'kulkarniaadi65@gmail.com'
     }
 
     stages {
         stage('Build') {
             steps {
-                echo "fetch the source code from the directory path specified by the environment variable: ${env.DIRECTORY_PATH}"
-                echo "compile the code and generate any necessary artifacts"
+                echo 'Building the code using Maven...'
+                // sh 'mvn clean package'
             }
         }
-        stage('Test') {
+        stage('Unit and Integration Tests') {
             steps {
-                echo "unit tests"
-                echo "integration tests"
+                echo 'Running Unit and Integration Tests using JUnit and Selenium...'
+                // sh 'mvn test'
+            }
+            post {
+                success {
+                    emailext(
+                        subject: "SUCCESS: Unit and Integration Tests - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
+                        body: """<p>Unit and Integration Tests for <b>${env.JOB_NAME}</b> completed successfully.</p>
+                                 <p>Check the attached logs for more details.</p>""",
+                        to: "${EMAIL_RECIPIENT}",
+                        mimeType: 'text/html',
+                        attachLog: true
+                    )
+                }
+                failure {
+                    emailext(
+                        subject: "FAILURE: Unit and Integration Tests - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
+                        body: """<p>Unit and Integration Tests for <b>${env.JOB_NAME}</b> failed.</p>
+                                 <p>Please check the attached logs for details.</p>""",
+                        to: "${EMAIL_RECIPIENT}",
+                        mimeType: 'text/html',
+                        attachLog: true
+                    )
+                }
             }
         }
-        stage('Code Quality Check') {
+        stage('Code Analysis') {
             steps {
-                echo "check the quality of the code"
+                echo 'Performing Code Analysis using SonarQube...'
+                // sh 'sonar-scanner'
             }
         }
-        stage('Deploy') {
+        stage('Security Scan') {
             steps {
-                echo "deploy the application to a testing environment specified by the environment variable: ${env.TESTING_ENVIRONMENT}"
+                echo 'Running Security Scan using OWASP Dependency-Check...'
+                // sh 'dependency-check --scan .'
+            }
+            post {
+                success {
+                    emailext(
+                        subject: "SUCCESS: Security Scan - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
+                        body: """<p>Security Scan for <b>${env.JOB_NAME}</b> completed successfully.</p>
+                                 <p>Check the attached logs for more details.</p>""",
+                        to: "${EMAIL_RECIPIENT}",
+                        mimeType: 'text/html',
+                        attachLog: true
+                    )
+                }
+                failure {
+                    emailext(
+                        subject: "FAILURE: Security Scan - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
+                        body: """<p>Security Scan for <b>${env.JOB_NAME}</b> failed.</p>
+                                 <p>Please check the attached logs for details.</p>""",
+                        to: "${EMAIL_RECIPIENT}",
+                        mimeType: 'text/html',
+                        attachLog: true
+                    )
+                }
             }
         }
-        stage('Approval') {
+        stage('Deploy to Staging') {
             steps {
-                echo "Waiting for manual approval...."
-                sleep 10
+                echo 'Deploying to Staging using AWS CLI...'
+                // sh 'aws deploy your-app-staging'
+            }
+        }
+        stage('Integration Tests on Staging') {
+            steps {
+                echo 'Running Integration Tests on Staging using Selenium/Postman...'
+                // sh './run-integration-tests.sh'
             }
         }
         stage('Deploy to Production') {
             steps {
-                echo "deploy the code to the production environment using the environment variable specifying the environment name: ${env.PRODUCTION_ENVIRONMENT}"
+                echo 'Deploying to Production using AWS CLI...'
+                // sh 'aws deploy your-app-production'
             }
         }
     }
+
+    post {
+        success {
+            emailext(
+                subject: "SUCCESS: Jenkins Pipeline - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
+                body: """<p>The Jenkins pipeline for <b>${env.JOB_NAME}</b> completed successfully.</p>
+                         <p>Check the attached logs for more details.</p>""",
+                to: "${EMAIL_RECIPIENT}",
+                mimeType: 'text/html',
+                attachLog: true
+            )
+        }
+        failure {
+            emailext(
+                subject: "FAILURE: Jenkins Pipeline - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
+                body: """<p>The Jenkins pipeline for <b>${env.JOB_NAME}</b> failed.</p>
+                         <p>Please check the attached logs for details.</p>""",
+                to: "${EMAIL_RECIPIENT}",
+                mimeType: 'text/html',
+                attachLog: true
+            )
+        }
+        always {
+            echo 'Pipeline complete.'
+        }
+    }
 }
+
+//Testing commit task 6.1C
