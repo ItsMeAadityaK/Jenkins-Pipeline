@@ -2,93 +2,93 @@ pipeline {
     agent any
 
     environment {
-        EMAIL_RECIPIENT = 'kulkarniaadi65@gmail.com'
+        RECIPIENT_EMAIL = 'kulkarniaadi65@gmail.com'
     }
 
     stages {
-        stage('Build') {
+        stage('Compile') {
             steps {
-                echo 'Building the code using Maven...'
+                echo 'Initiating the build process with Maven...'
                 // sh 'mvn clean package'
             }
         }
-        stage('Unit and Integration Tests') {
+        stage('Execute Unit and Integration Tests') {
             steps {
-                echo 'Running Unit and Integration Tests using JUnit and Selenium...'
+                echo 'Executing unit and integration tests using JUnit and Selenium frameworks...'
                 // sh 'mvn test'
             }
             post {
                 success {
                     emailext(
-                        subject: "SUCCESS: Unit and Integration Tests - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
-                        body: """<p>Unit and Integration Tests for <b>${env.JOB_NAME}</b> completed successfully.</p>
-                                 <p>Check the attached logs for more details.</p>""",
-                        to: "${EMAIL_RECIPIENT}",
+                        subject: "SUCCESS: Unit & Integration Tests - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
+                        body: """<p>The unit and integration tests for project <b>${env.JOB_NAME}</b> have successfully passed.</p>
+                                 <p>Logs have been attached for further reference.</p>""",
+                        to: "${RECIPIENT_EMAIL}",
                         mimeType: 'text/html',
                         attachLog: true
                     )
                 }
                 failure {
                     emailext(
-                        subject: "FAILURE: Unit and Integration Tests - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
-                        body: """<p>Unit and Integration Tests for <b>${env.JOB_NAME}</b> failed.</p>
-                                 <p>Please check the attached logs for details.</p>""",
-                        to: "${EMAIL_RECIPIENT}",
+                        subject: "FAILURE: Unit & Integration Tests - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
+                        body: """<p>The unit and integration tests for project <b>${env.JOB_NAME}</b> encountered an error.</p>
+                                 <p>Kindly review the attached logs for detailed information.</p>""",
+                        to: "${RECIPIENT_EMAIL}",
                         mimeType: 'text/html',
                         attachLog: true
                     )
                 }
             }
         }
-        stage('Code Analysis') {
+        stage('Static Code Analysis') {
             steps {
-                echo 'Performing Code Analysis using SonarQube...'
+                echo 'Starting static code analysis with SonarQube...'
                 // sh 'sonar-scanner'
             }
         }
-        stage('Security Scan') {
+        stage('Security Assessment') {
             steps {
-                echo 'Running Security Scan using OWASP Dependency-Check...'
+                echo 'Conducting security assessment using OWASP Dependency-Check...'
                 // sh 'dependency-check --scan .'
             }
             post {
                 success {
                     emailext(
-                        subject: "SUCCESS: Security Scan - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
-                        body: """<p>Security Scan for <b>${env.JOB_NAME}</b> completed successfully.</p>
-                                 <p>Check the attached logs for more details.</p>""",
-                        to: "${EMAIL_RECIPIENT}",
+                        subject: "SUCCESS: Security Assessment - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
+                        body: """<p>The security assessment for <b>${env.JOB_NAME}</b> has been completed successfully.</p>
+                                 <p>Please check the attached logs for further details.</p>""",
+                        to: "${RECIPIENT_EMAIL}",
                         mimeType: 'text/html',
                         attachLog: true
                     )
                 }
                 failure {
                     emailext(
-                        subject: "FAILURE: Security Scan - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
-                        body: """<p>Security Scan for <b>${env.JOB_NAME}</b> failed.</p>
-                                 <p>Please check the attached logs for details.</p>""",
-                        to: "${EMAIL_RECIPIENT}",
+                        subject: "FAILURE: Security Assessment - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
+                        body: """<p>The security scan for <b>${env.JOB_NAME}</b> failed.</p>
+                                 <p>Attached are the logs for your review.</p>""",
+                        to: "${RECIPIENT_EMAIL}",
                         mimeType: 'text/html',
                         attachLog: true
                     )
                 }
             }
         }
-        stage('Deploy to Staging') {
+        stage('Stage Deployment') {
             steps {
-                echo 'Deploying to Staging using AWS CLI...'
+                echo 'Deploying application to staging environment using AWS CLI...'
                 // sh 'aws deploy your-app-staging'
             }
         }
-        stage('Integration Tests on Staging') {
+        stage('Staging Environment Tests') {
             steps {
-                echo 'Running Integration Tests on Staging using Selenium/Postman...'
+                echo 'Executing integration tests in the staging environment using Selenium/Postman...'
                 // sh './run-integration-tests.sh'
             }
         }
-        stage('Deploy to Production') {
+        stage('Production Deployment') {
             steps {
-                echo 'Deploying to Production using AWS CLI...'
+                echo 'Deploying application to production environment using AWS CLI...'
                 // sh 'aws deploy your-app-production'
             }
         }
@@ -97,28 +97,26 @@ pipeline {
     post {
         success {
             emailext(
-                subject: "SUCCESS: Jenkins Pipeline - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
-                body: """<p>The Jenkins pipeline for <b>${env.JOB_NAME}</b> completed successfully.</p>
-                         <p>Check the attached logs for more details.</p>""",
-                to: "${EMAIL_RECIPIENT}",
+                subject: "SUCCESS: Jenkins Pipeline Execution - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
+                body: """<p>The Jenkins pipeline for project <b>${env.JOB_NAME}</b> has successfully completed.</p>
+                         <p>Logs have been attached for your review.</p>""",
+                to: "${RECIPIENT_EMAIL}",
                 mimeType: 'text/html',
                 attachLog: true
             )
         }
         failure {
             emailext(
-                subject: "FAILURE: Jenkins Pipeline - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
-                body: """<p>The Jenkins pipeline for <b>${env.JOB_NAME}</b> failed.</p>
-                         <p>Please check the attached logs for details.</p>""",
-                to: "${EMAIL_RECIPIENT}",
+                subject: "FAILURE: Jenkins Pipeline Execution - ${env.JOB_NAME} Build #${env.BUILD_NUMBER}",
+                body: """<p>The Jenkins pipeline for project <b>${env.JOB_NAME}</b> encountered an error and failed.</p>
+                         <p>Please check the attached logs for more information.</p>""",
+                to: "${RECIPIENT_EMAIL}",
                 mimeType: 'text/html',
                 attachLog: true
             )
         }
         always {
-            echo 'Pipeline complete.'
+            echo 'Pipeline execution has completed.'
         }
     }
 }
-
-//Testing commit task 6.1C
